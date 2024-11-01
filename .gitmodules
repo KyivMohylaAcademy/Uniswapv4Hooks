@@ -1,3 +1,6 @@
 [submodule "olena_kryhina/lib/forge-std"]
 	path = olena_kryhina/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "olena_kryhina/lib/solmate"]
+	path = olena_kryhina/lib/solmate
+	url = https://github.com/transmissions11/solmate
