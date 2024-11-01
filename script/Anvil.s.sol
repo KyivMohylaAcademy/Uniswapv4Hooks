@@ -11,6 +11,9 @@ import {PoolSwapTest} from "v4-core/src/test/PoolSwapTest.sol";
 import {PoolDonateTest} from "v4-core/src/test/PoolDonateTest.sol";
 import {PoolKey} from "v4-core/src/types/PoolKey.sol";
 import {MockERC20} from "solmate/src/test/utils/mocks/MockERC20.sol";
+import {BERC20} from "../src/BERC20.sol";
+import {SERC20} from "../src/SERC20.sol";
+import {Discount} from "../src/Discount.sol";
 import {Constants} from "v4-core/src/../test/utils/Constants.sol";
 import {TickMath} from "v4-core/src/libraries/TickMath.sol";
 import {CurrencyLibrary, Currency} from "v4-core/src/types/Currency.sol";
@@ -23,6 +26,7 @@ import {IAllowanceTransfer} from "permit2/src/interfaces/IAllowanceTransfer.sol"
 import {DeployPermit2} from "../test/utils/forks/DeployPermit2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {IPositionDescriptor} from "v4-periphery/src/interfaces/IPositionDescriptor.sol";
+import {console} from "forge-std/console.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
@@ -38,10 +42,7 @@ contract CounterScript is Script, DeployPermit2 {
         IPoolManager manager = deployPoolManager();
 
         // hook contracts must have specific flags encoded in the address
-        uint160 permissions = uint160(
-            Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG | Hooks.BEFORE_ADD_LIQUIDITY_FLAG
-                | Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG
-        );
+        uint160 permissions = uint160(Hooks.BEFORE_SWAP_FLAG);
 
         // Mine a salt that will produce a hook address with the correct permissions
         (address hookAddress, bytes32 salt) =
@@ -95,16 +96,9 @@ contract CounterScript is Script, DeployPermit2 {
         permit2.approve(Currency.unwrap(currency), address(posm), type(uint160).max, type(uint48).max);
     }
 
-    function deployTokens() internal returns (MockERC20 token0, MockERC20 token1) {
-        MockERC20 tokenA = new MockERC20("MockA", "A", 18);
-        MockERC20 tokenB = new MockERC20("MockB", "B", 18);
-        if (uint160(address(tokenA)) < uint160(address(tokenB))) {
-            token0 = tokenA;
-            token1 = tokenB;
-        } else {
-            token0 = tokenB;
-            token1 = tokenA;
-        }
+    function deployTokens() internal returns (BERC20 token0, SERC20 token1) {
+        token0 = new BERC20();
+        token1 = new SERC20();
     }
 
     function testLifecycle(
@@ -114,9 +108,11 @@ contract CounterScript is Script, DeployPermit2 {
         PoolModifyLiquidityTest lpRouter,
         PoolSwapTest swapRouter
     ) internal {
-        (MockERC20 token0, MockERC20 token1) = deployTokens();
+        (BERC20 token0, SERC20 token1) = deployTokens();
         token0.mint(msg.sender, 100_000 ether);
         token1.mint(msg.sender, 100_000 ether);
+        Discount discount = Counter(hook).discountContract();
+        discount.mint(msg.sender, 5);
 
         bytes memory ZERO_BYTES = new bytes(0);
 
@@ -157,7 +153,7 @@ contract CounterScript is Script, DeployPermit2 {
         );
 
         // swap some tokens
-        bool zeroForOne = true;
+        bool zeroForOne = false;
         int256 amountSpecified = 1 ether;
         IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
             zeroForOne: zeroForOne,
@@ -167,5 +163,8 @@ contract CounterScript is Script, DeployPermit2 {
         PoolSwapTest.TestSettings memory testSettings =
             PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
         swapRouter.swap(poolKey, params, testSettings, ZERO_BYTES);
+	uint256 serc20Balance = token1.balanceOf(msg.sender);
+	uint256 berc20Balance = token0.balanceOf(msg.sender);
+	console.log("SERC20 balance: %s BERC20 balance: %s", serc20Balance, berc20Balance);
     }
 }

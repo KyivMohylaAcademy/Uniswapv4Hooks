@@ -5,6 +5,7 @@ import "forge-std/Script.sol";
 import {PositionManager} from "v4-periphery/src/PositionManager.sol";
 import {PoolKey} from "v4-core/src/types/PoolKey.sol";
 import {CurrencyLibrary, Currency} from "v4-core/src/types/Currency.sol";
+import {LPFeeLibrary} from "v4-core/src/libraries/LPFeeLibrary.sol";
 import {Actions} from "v4-periphery/src/libraries/Actions.sol";
 import {LiquidityAmounts} from "v4-core/test/utils/LiquidityAmounts.sol";
 import {TickMath} from "v4-core/src/libraries/TickMath.sol";
@@ -22,7 +23,7 @@ contract CreatePoolAndAddLiquidityScript is Script, Constants, Config {
 
     // --- pool configuration --- //
     // fees paid by swappers that accrue to liquidity providers
-    uint24 lpFee = 3000; // 0.30%
+    // uint24 lpFee = 3000; // 0.30%
     int24 tickSpacing = 60;
 
     // starting price of the pool, in sqrtPriceX96
@@ -42,7 +43,7 @@ contract CreatePoolAndAddLiquidityScript is Script, Constants, Config {
         PoolKey memory pool = PoolKey({
             currency0: currency0,
             currency1: currency1,
-            fee: lpFee,
+            fee: LPFeeLibrary.DYNAMIC_FEE_FLAG,
             tickSpacing: tickSpacing,
             hooks: hookContract
         });

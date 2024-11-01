@@ -26,7 +26,7 @@ contract AddLiquidityScript is Script, Constants, Config {
 
     // --- pool configuration --- //
     // fees paid by swappers that accrue to liquidity providers
-    uint24 lpFee = 3000; // 0.30%
+    // uint24 lpFee = 3000; // 0.30%
     int24 tickSpacing = 60;
 
     // --- liquidity position configuration --- //
