@@ -1,0 +1,3 @@
+[submodule "olena_kryhina/lib/forge-std"]
+	path = olena_kryhina/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
