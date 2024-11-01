@@ -7,4 +7,3 @@
 Приклад: у Buyer NFT з discount 15% та 30 токенів AC/DC. У Seller 50 токенів Slayer. Результат свопу у Seller 25.5, у Buyer 50 AC/DC.
 
 Результати подати пулреквестом в main
-
