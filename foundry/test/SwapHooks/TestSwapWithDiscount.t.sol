@@ -11,43 +11,39 @@ contract TestSwapHooks is BaseSwapHooksTest {
         uint256 amountOut = 50; // Amount of TokenB the buyer should receive without discount
 
         // Log the initial state before approval
-        logInitialState();
-
-        // Approve SwapHooks to spend amountIn TokenA
-        approveSwapHooks(amountIn);
-
-        // Execute the swap
-        executeSwap(amountIn, amountOut);
-
-        // Validate the final balances
-        validateFinalBalances();
-    }
-
-    function logInitialState() internal view {
         console.log("Buyer before approval:", buyer);
         console.log("Token A balance before approval:", tokenA.balanceOf(buyer));
-    }
 
-    function approveSwapHooks(uint256 amountIn) internal {
+        // Approve SwapHooks to spend amountIn TokenA
         vm.prank(buyer); // Set the context to the buyer's address
         tokenA.approve(address(swapHooks), amountIn);
         console.log("Allowance of SwapHooks to spend TokenA:", tokenA.allowance(buyer, address(swapHooks)));
-    }
 
-    function executeSwap(uint256 amountIn, uint256 amountOut) internal {
+        // Log balances
+        console.log("Initial Token A balance of buyer:", tokenA.balanceOf(buyer));
+        console.log("Initial Token B balance of buyer:", tokenB.balanceOf(buyer));
+        console.log("Initial Token A balance of seller:", tokenA.balanceOf(address(swapHooks)));
+        console.log("Initial Token B balance of seller:", tokenB.balanceOf(address(swapHooks)));
+
+        // Execute the swap
         console.log("Executing swap with amountIn:", amountIn, "and amountOut:", amountOut);
         swapHooks.beforeSwap(buyer, 0, amountIn, amountOut); // Call beforeSwap
         console.log("Swap executed");
-    }
 
-    function validateFinalBalances() internal view{
-        uint256 finalBalanceA = tokenA.balanceOf(buyer);
-        uint256 finalBalanceB = tokenB.balanceOf(buyer);
+        // Validate the final balances
+        uint256 finalBuyerBalanceA = tokenA.balanceOf(buyer);
+        uint256 finalBuyerBalanceB = tokenB.balanceOf(buyer);
+        uint256 finalSellerBalanceA = tokenA.balanceOf(address(swapHooks));
+        uint256 finalSellerBalanceB = tokenB.balanceOf(address(swapHooks));
 
-        console.log("Final Token A balance of buyer:", finalBalanceA); // Check remaining TokenA
-        console.log("Final Token B balance of buyer:", finalBalanceB); // Check received TokenB
+        console.log("Final Token A balance of buyer:", finalBuyerBalanceA);
+        console.log("Final Token B balance of buyer:", finalBuyerBalanceB);
+        console.log("Final Token A balance of seller:", finalSellerBalanceA);
+        console.log("Final Token B balance of seller:", finalSellerBalanceB);
 
-        assertEq(finalBalanceA, 70); // 100 - 30 = 70 TokenA
-        assertEq(finalBalanceB, 43); // 50 - 15% = 43
+        assertEq(finalBuyerBalanceA, 74);
+        assertEq(finalBuyerBalanceB, 50);
+        assertEq(finalSellerBalanceA, 26);
+        assertEq(finalSellerBalanceB, 50);
     }
 }

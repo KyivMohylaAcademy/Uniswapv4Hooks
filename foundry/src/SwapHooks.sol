@@ -26,27 +26,22 @@ contract SwapHooks is Ownable {
 
         // Get the discount percentage
         uint8 discount = discountNFT.getDiscount(tokenId);
-        console.log("Buyer:", buyer);
-        console.log("Token ID:", tokenId);
-        console.log("Original Amount Out:", amountOut);
-        console.log("Discount Percentage:", discount);
-        console.log("address(this):", address(this));
 
         // Calculate the discounted amount
-        uint256 discountAmount = (amountOut * discount) / 100;
-        uint256 finalAmountOut = amountOut - discountAmount;
+        uint256 discountAmount = (amountIn * discount) / 100;
+        uint256 finalAmountIn = amountIn - discountAmount;
 
         // Log calculated amounts
         console.log("Discount Amount:", discountAmount);
-        console.log("Final Amount Out after Discount:", finalAmountOut);
+        console.log("Final Amount In after Discount:", finalAmountIn);
 
         // Check allowances and balances
         checkBuyerBalance(buyer, amountIn);
-        checkContractBalance(finalAmountOut);
+        checkContractBalance(amountOut);
         checkAllowance(buyer, amountIn);
 
         // Perform the token transfer
-        executeSwap(buyer, amountIn, finalAmountOut);
+        executeSwap(buyer, finalAmountIn, amountOut);
     }
 
     function checkAllowance(address buyer, uint256 amountIn) internal view {
