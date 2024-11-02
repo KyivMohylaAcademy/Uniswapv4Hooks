@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// Import necessary contracts and libraries
-import "forge-std/Test.sol"; // Importing the Forge testing library
-import "../SwapHooks/BaseSwapHooksTest.t.sol"; // Importing the base test contract
+import "forge-std/Test.sol";
+import "../SwapHooks/BaseSwapHooksTest.t.sol";
 
 contract TestSwapHooks is BaseSwapHooksTest {
     function testSwapWithDiscount() public {
@@ -15,7 +14,7 @@ contract TestSwapHooks is BaseSwapHooksTest {
         console.log("Token A balance before approval:", tokenA.balanceOf(buyer));
 
         // Approve SwapHooks to spend amountIn TokenA
-        vm.prank(buyer); // Set the context to the buyer's address
+        vm.prank(buyer);
         tokenA.approve(address(swapHooks), amountIn);
         console.log("Allowance of SwapHooks to spend TokenA:", tokenA.allowance(buyer, address(swapHooks)));
 
@@ -27,7 +26,7 @@ contract TestSwapHooks is BaseSwapHooksTest {
 
         // Execute the swap
         console.log("Executing swap with amountIn:", amountIn, "and amountOut:", amountOut);
-        swapHooks.beforeSwap(buyer, 0, amountIn, amountOut); // Call beforeSwap
+        swapHooks.beforeSwap(buyer, 0, amountIn, amountOut);
         console.log("Swap executed");
 
         // Validate the final balances

@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// Import necessary contracts and libraries
-import "forge-std/Test.sol"; // Importing the Forge testing library
-import "../SwapHooks/BaseSwapHooksTest.t.sol"; // Importing the base test contract
+import "forge-std/Test.sol";
+import "../SwapHooks/BaseSwapHooksTest.t.sol";
 
 contract TestInsufficientBalance is BaseSwapHooksTest {
 
@@ -17,7 +16,7 @@ contract TestInsufficientBalance is BaseSwapHooksTest {
         
         // Expect the revert with the specified message
         vm.expectRevert("Not enough TokenA");
-        swapHooks.beforeSwap(buyer, 0, amountIn, amountOut); // Call beforeSwap
+        swapHooks.beforeSwap(buyer, 0, amountIn, amountOut);
         
         // Log that the function was called
         console.log("Called beforeSwap with amountIn:", amountIn, "and amountOut:", amountOut);
@@ -33,7 +32,7 @@ contract TestInsufficientBalance is BaseSwapHooksTest {
         
         // Expect the revert with the specified message
         vm.expectRevert("Not enough TokenB in the contract");
-        swapHooks.beforeSwap(buyer, 0, amountIn, amountOut); // Call beforeSwap
+        swapHooks.beforeSwap(buyer, 0, amountIn, amountOut);
         
         // Log that the function was called
         console.log("Called beforeSwap with amountIn:", amountIn, "and amountOut:", amountOut);

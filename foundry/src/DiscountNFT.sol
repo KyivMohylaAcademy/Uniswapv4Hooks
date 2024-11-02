@@ -6,9 +6,8 @@ import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
 contract DiscountNFT is ERC721, Ownable {
     uint256 public tokenIdCounter;
-    mapping(uint256 => uint8) public discount; // Зберігає знижку для кожного токена
+    mapping(uint256 => uint8) public discount;
 
-    // Виклик конструктора ERC721 з передачею імені та символу токена
     constructor() ERC721("DiscountNFT", "DNFT") Ownable(msg.sender) {}
 
     function mint(address to, uint8 _discount) external onlyOwner {
@@ -27,7 +26,7 @@ contract DiscountNFT is ERC721, Ownable {
 
     function burn(uint256 tokenId) public onlyOwner {
         _burn(tokenId);
-        delete discount[tokenId]; // Вилучаємо знижку для знищеного токена
+        delete discount[tokenId];
     }
 
     function exists(uint256 tokenId) external view returns (bool) {
