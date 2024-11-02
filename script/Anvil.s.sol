@@ -26,9 +26,6 @@ import {IAllowanceTransfer} from "permit2/src/interfaces/IAllowanceTransfer.sol"
 import {DeployPermit2} from "../test/utils/forks/DeployPermit2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {IPositionDescriptor} from "v4-periphery/src/interfaces/IPositionDescriptor.sol";
-import {DiscountNFT} from "../src/DiscountNFT.sol";
-import {SERC20} from "../src/SERC20.sol";
-import {BERC20} from "../src/BERC20.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
@@ -43,20 +40,27 @@ contract CounterScript is Script, DeployPermit2 {
         vm.broadcast();
         IPoolManager manager = deployPoolManager();
 
+        // Deploy the DiscountNFT contract
+        vm.broadcast();
+        DiscountNFT discountNFT = new DiscountNFT();
+
         // hook contracts must have specific flags encoded in the address
         uint160 permissions = uint160(
             Hooks.BEFORE_SWAP_FLAG
         );
 
+        // Prepare constructor arguments for Counter
+        bytes memory constructorArgs = abi.encode(address(manager), address(discountNFT));
+
         // Mine a salt that will produce a hook address with the correct permissions
         (address hookAddress, bytes32 salt) =
-            HookMiner.find(CREATE2_DEPLOYER, permissions, type(Counter).creationCode, abi.encode(address(manager)));
+                            HookMiner.find(CREATE2_DEPLOYER, permissions, type(Counter).creationCode, constructorArgs);
 
         // ----------------------------- //
         // Deploy the hook using CREATE2 //
         // ----------------------------- //
         vm.broadcast();
-        Counter counter = new Counter{salt: salt}(manager);
+        Counter counter = new Counter{salt: salt}(manager, discountNFT);
         require(address(counter) == hookAddress, "CounterScript: hook address mismatch");
 
         // Additional helpers for interacting with the pool
@@ -67,7 +71,7 @@ contract CounterScript is Script, DeployPermit2 {
 
         // test the lifecycle (create pool, add liquidity, swap)
         vm.startBroadcast();
-        testLifecycle(manager, address(counter), posm, lpRouter, swapRouter);
+        testLifecycle(manager, address(counter), posm, lpRouter, swapRouter, discountNFT);
         vm.stopBroadcast();
     }
 
@@ -79,8 +83,8 @@ contract CounterScript is Script, DeployPermit2 {
     }
 
     function deployRouters(IPoolManager manager)
-        internal
-        returns (PoolModifyLiquidityTest lpRouter, PoolSwapTest swapRouter, PoolDonateTest donateRouter)
+    internal
+    returns (PoolModifyLiquidityTest lpRouter, PoolSwapTest swapRouter, PoolDonateTest donateRouter)
     {
         lpRouter = new PoolModifyLiquidityTest(manager);
         swapRouter = new PoolSwapTest(manager);
@@ -110,20 +114,22 @@ contract CounterScript is Script, DeployPermit2 {
         address hook,
         IPositionManager posm,
         PoolModifyLiquidityTest lpRouter,
-        PoolSwapTest swapRouter
+        PoolSwapTest swapRouter,
+        DiscountNFT discountNFT
     ) internal {
         (BERC20 token0, SERC20 token1) = deployTokens();
         token0.mint(msg.sender, 100_000 ether);
         token1.mint(msg.sender, 100_000 ether);
-        DiscountNFT discount = Counter(hook).discountContract();
-        discount.mint(msg.sender, 5);
+
+        // Mint a DiscountNFT to msg.sender with a discount of 15%
+        discountNFT.mint(msg.sender, 15);
 
         bytes memory ZERO_BYTES = new bytes(0);
 
         // initialize the pool
         int24 tickSpacing = 60;
         PoolKey memory poolKey =
-            PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, tickSpacing, IHooks(hook));
+                        PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, tickSpacing, IHooks(hook));
         manager.initialize(poolKey, Constants.SQRT_PRICE_1_1);
 
         // approve the tokens to the routers
@@ -165,7 +171,7 @@ contract CounterScript is Script, DeployPermit2 {
             sqrtPriceLimitX96: zeroForOne ? TickMath.MIN_SQRT_PRICE + 1 : TickMath.MAX_SQRT_PRICE - 1 // unlimited impact
         });
         PoolSwapTest.TestSettings memory testSettings =
-            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
+                            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
         swapRouter.swap(poolKey, params, testSettings, ZERO_BYTES);
     }
 }
