@@ -1,66 +1,9 @@
-## Foundry
+1. Створити смартконтракт ERC-721, в якому в метадаті є поле discount з значенням від 0 до 20. Зробити за допомогою keypair екаунти Buyer та Seller та поповнити їх баланс з фасету. Змінтити NFT токен екаунту Buyer. 
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+2. Створити 2 контракти токенів ERC-20 для свопа і змінтити з одного токени для Buyer, з іншого для Seller. 
 
-Foundry consists of:
+3. Створити контракт Uniswap v4 Hooks, який перевіряє хук beforeSwap на наявність у акаунта Buyer NFT та робить свап з діскаунтом на комісію, який вказаний в метадаті NFT. 
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+Приклад: у Buyer NFT з discount 15% та 30 токенів AC/DC. У Seller 50 токенів Slayer. Результат свопу у Seller 25.5, у Buyer 50 AC/DC.
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+Результати подати пулреквестом в репо https://github.com/KyivMohylaAcademy/Uniswapv4Hooks/ та скріншотом 

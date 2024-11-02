@@ -1,6 +1,11 @@
 [profile.default]
 src = "src"
 out = "out"
-libs = ["lib"]
+evm_version = "cancun"
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "@uniswap/v4-core/=lib/uniswap-v4-core/",
+    "@uniswap/v4-periphery/=lib/uniswap-v4-periphery/"
+]
