@@ -7,3 +7,6 @@
 [submodule "olena_kryhina/lib/openzeppelin-contracts"]
 	path = olena_kryhina/lib/openzeppelin-contracts
 	url = https://github.com/Openzeppelin/openzeppelin-contracts
+[submodule "olena_kryhina/lib/v4-core"]
+	path = olena_kryhina/lib/v4-core
+	url = https://github.com/Uniswap/v4-core
