@@ -4,7 +4,7 @@ async function main() {
   console.log("Checking NFT ownership for Buyer at address:", buyer.address);
 
   // Підключення до контракту DiscountNFT
-  const discountNFTAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"; // Address of the deployed DiscountNFT contract
+  const discountNFTAddress = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"; // Address of the deployed DiscountNFT contract
   const DiscountNFT = await ethers.getContractFactory("DiscountNFT");
   const discountNFT = DiscountNFT.attach(discountNFTAddress);
 
