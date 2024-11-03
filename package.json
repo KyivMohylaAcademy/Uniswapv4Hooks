@@ -1,0 +1,20 @@
+{
+  "name": "uniswapv4hooks",
+  "version": "1.0.0",
+  "description": "uniswapv4hooks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Oleksandr Terentyev &lt;terentyev.olexandr@gmail.com&gt",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.22.15"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.1.0"
+  }
+}
