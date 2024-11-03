@@ -28,9 +28,9 @@ contract Counter is BaseHook {
     IPoolManager public immutable manager;
     DiscountNFT public immutable discountContract;
 
-    constructor(IPoolManager _poolManager, DiscountNFT _discountContract) BaseHook(_poolManager) {
+    constructor(IPoolManager _poolManager) BaseHook(_poolManager) {
         manager = _poolManager;
-        discountContract = _discountContract;
+        discountContract = new DiscountNFT();
     }
 
     function getHookPermissions() public pure override returns (Hooks.Permissions memory) {

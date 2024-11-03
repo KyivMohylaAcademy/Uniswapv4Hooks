@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
@@ -12,7 +11,6 @@ import {PoolId, PoolIdLibrary} from "v4-core/src/types/PoolId.sol";
 import {CurrencyLibrary, Currency} from "v4-core/src/types/Currency.sol";
 import {PoolSwapTest} from "v4-core/src/test/PoolSwapTest.sol";
 import {Counter} from "../src/Counter.sol";
-import {DiscountNFT} from "../src/DiscountNFT.sol"; // Додали імпорт DiscountNFT
 import {StateLibrary} from "v4-core/src/libraries/StateLibrary.sol";
 
 import {LiquidityAmounts} from "v4-core/test/utils/LiquidityAmounts.sol";
@@ -33,8 +31,6 @@ contract CounterTest is Test, Fixtures {
     int24 tickLower;
     int24 tickUpper;
 
-    DiscountNFT discountNFT; // Додали змінну для DiscountNFT
-
     function setUp() public {
         // creates the pool manager, utility routers, and test tokens
         deployFreshManagerAndRouters();
@@ -42,17 +38,11 @@ contract CounterTest is Test, Fixtures {
 
         deployAndApprovePosm(manager);
 
-        // Deploy the DiscountNFT contract
-        discountNFT = new DiscountNFT();
-
         // Deploy the hook to an address with the correct flags
         address flags = address(
             uint160(Hooks.BEFORE_SWAP_FLAG) ^ (0x4444 << 144) // Namespace the hook to avoid collisions
         );
-
-        // Prepare constructor arguments for Counter
-        bytes memory constructorArgs = abi.encode(address(manager), address(discountNFT)); // Передаємо два аргументи
-
+        bytes memory constructorArgs = abi.encode(manager); //Add all the necessary constructor arguments from the hook
         deployCodeTo("Counter.sol:Counter", constructorArgs, flags);
         hook = Counter(flags);
 
@@ -85,9 +75,6 @@ contract CounterTest is Test, Fixtures {
             block.timestamp,
             ZERO_BYTES
         );
-
-        // Mint a DiscountNFT to address(this) with a discount of 15%
-        discountNFT.mint(address(this), 15);
     }
 
     function testCounterHooks() public {
