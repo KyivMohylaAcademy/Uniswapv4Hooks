@@ -1,0 +1,42 @@
+pragma solidity ^0.8.0;
+
+import "@uniswap/v4-core/contracts/interfaces/IUniswapV4Pair.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+contract UniswapV4Hooks {
+    IERC721 public discountNFT;
+    IERC20 public acdc;
+    IERC20 public slayer;
+
+    constructor(address _discountNFT, address _acdc, address _slayer) {
+        discountNFT = IERC721(_discountNFT);
+        acdc = IERC20(_acdc);
+        slayer = IERC20(_slayer);
+    }
+
+    function beforeSwap(
+        address sender,
+        address recipient,
+        uint256 amountIn,
+        uint256 amountOut,
+        uint256 liquidity,
+        bytes calldata data
+    ) external returns (bool) {
+        uint256 nftBalance = discountNFT.balanceOf(sender);
+        if (nftBalance > 0) {
+            uint256 tokenId = discountNFT.tokenOfOwnerByIndex(sender, 0);
+            uint8 discount = discountNFT.nftMetadata(tokenId).discount;
+
+            uint256 fee = (amountIn * (30 - discount)) / 3000;
+            uint256 amountOutWithDiscount = amountOut - fee;
+
+            acdc.transferFrom(sender, recipient, amountIn);
+            slayer.transfer(sender, amountOutWithDiscount);
+
+            return true;
+        }
+
+        return false;
+    }
+}

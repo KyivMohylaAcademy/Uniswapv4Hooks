@@ -1,0 +1,16 @@
+{
+  "name": "defi-practice-2",
+  "version": "1.0.0",
+  "description": "1. Створити смартконтракт ERC-721, в якому в метадаті є поле discount з значенням від 0 до 20. Зробити за допомогою keypair екаунти Buyer та Seller та поповнити їх баланс з фасету. Змінтити NFT токен екаунту Buyer.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.15"
+  }
+}
